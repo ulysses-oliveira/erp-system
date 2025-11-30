@@ -21,6 +21,7 @@ coverage/
 prisma/*.db
 prisma/migrations/
 !.gitkeep
+/src/generated/prisma
 
 # Logs
 logs/
