@@ -1,43 +1,24 @@
-import { fastify } from 'fastify'
-import {
-  serializerCompiler,
-  validatorCompiler,
-  jsonSchemaTransform,
-  type ZodTypeProvider,
-} from 'fastify-type-provider-zod'
-import { fastifySwagger } from '@fastify/swagger'
-import { fastifyCors } from '@fastify/cors'
-import ScalarApiReference from '@scalar/fastify-api-reference'
+import { prisma } from './config/prisma'
+import { env } from './config/env'
+import { buildApp } from './app'
 
-import { env } from './config/env.js'
+async function bootstrap() {
+  try {
+    console.log('🔍 Testando conexão com o banco de dados...')
+    await prisma.$connect()
+    // await prisma.$queryRaw`SELECT 1` // força o handshake real
+    console.log('✅ Banco conectado com sucesso!')
 
-const app = fastify().withTypeProvider<ZodTypeProvider>()
+    const app = buildApp()
 
-app.setValidatorCompiler(validatorCompiler)
-app.setSerializerCompiler(serializerCompiler)
+    await app.listen({ port: env.PORT, host: '0.0.0.0' })
 
-app.register(fastifyCors, {
-  origin: 'true',
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  // credentials: true,
-})
+    console.log(`🔥 Servidor rodando: http://localhost:${env.PORT}`)
+    console.log(`📚 Documentação: http://localhost:${env.PORT}/docs`)
+  } catch (error) {
+    console.error('❌ Erro ao iniciar servidor ou conectar no banco:', error)
+    process.exit(1)
+  }
+}
 
-app.register(fastifySwagger, {
-  openapi: {
-    info: {
-      title: 'ERP System API',
-      description: 'API documentation for the ERP System',
-      version: '1.0.0',
-    },
-  },
-  transform: jsonSchemaTransform,
-})
-
-app.register(ScalarApiReference, {
-  routePrefix: '/docs',
-})
-
-app.listen({ port: env.PORT, host: '0.0.0.0' }).then(() => {
-  console.log(`🔥 HTTP server running on http://localhost:${env.PORT}`)
-  console.log(`📚 Docs available at http://localhost:${env.PORT}/docs`)
-})
+bootstrap()
