@@ -4,7 +4,9 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 const envSchema = z.object({
-  DATABASE_URL: z.string().url(),
+  DATABASE_URL: z.string(),
+  DB_HOST: z.string(),
+  DB_PORT: z.coerce.number().min(1).max(65535),
   PORT: z.coerce.number().default(7000),
 
   JWT_SECRET: z.string().min(16),
@@ -23,7 +25,7 @@ const envSchema = z.object({
   SMTP_PORT: z.coerce.number(),
 
   EFI_BANK_API_KEY: z.string(),
-  EFI_BANK_BASE_URL: z.string().url(),
+  EFI_BANK_BASE_URL: z.string(),
 })
 
 const parsed = envSchema.safeParse(process.env)
