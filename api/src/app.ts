@@ -9,7 +9,7 @@ import { fastifySwagger } from '@fastify/swagger'
 import { fastifyCors } from '@fastify/cors'
 import ScalarApiReference from '@scalar/fastify-api-reference'
 
-import { jwtPlugin } from './plugins/jwt'
+import jwtPlugin from './plugins/jwt'
 import modulesAutoLoader from './plugins/autoloader'
 
 export function buildApp() {
