@@ -15,14 +15,24 @@ export const userRepository = {
   },
 
   async create(data: CreateUserInput): Promise<UserEntity> {
-    return prisma.user.create({ data })
+    return prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        password_hash: data.password,
+        role: data.role ?? 'USER',
+      },
+    })
   },
 
-  async update(id: number, data: Partial<CreateUserInput>): Promise<UserEntity> {
+  async update(
+    id: number,
+    data: Partial<CreateUserInput>,
+  ): Promise<UserEntity> {
     return prisma.user.update({ where: { id }, data })
   },
 
   async delete(id: number): Promise<UserEntity> {
-    return prisma.user.delete({ where: { id }})
-  }
+    return prisma.user.delete({ where: { id } })
+  },
 }

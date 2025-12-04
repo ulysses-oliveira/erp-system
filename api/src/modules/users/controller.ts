@@ -9,7 +9,9 @@ export const userController = {
       reply.send(users)
     } catch (error) {
       console.error('[UserController] Erro ao listar usuários:', error)
-      reply.status(500).send({ message: 'Internal Server Error', error: String(error) })
+      reply
+        .status(500)
+        .send({ message: 'Internal Server Error', error: String(error) })
     }
   },
 
@@ -41,7 +43,10 @@ export const userController = {
   },
 
   update: async (
-    request: FastifyRequest<{ Params: { userId: string }; Body: UpdateUserInput }>,
+    request: FastifyRequest<{
+      Params: { userId: string }
+      Body: UpdateUserInput
+    }>,
     reply: FastifyReply,
   ) => {
     try {
@@ -65,6 +70,6 @@ export const userController = {
     } catch (error) {
       console.error('[UserController] Erro ao deletar usuário:', error)
       reply.status(400).send({ message: String(error) })
-    } 
-  }
+    }
+  },
 }
