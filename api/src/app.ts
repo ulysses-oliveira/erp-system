@@ -9,6 +9,7 @@ import { fastifySwagger } from '@fastify/swagger'
 import { fastifyCors } from '@fastify/cors'
 import ScalarApiReference from '@scalar/fastify-api-reference'
 
+import jwtPlugin from './plugins/jwt'
 import modulesAutoLoader from './plugins/autoloader'
 
 export function buildApp() {
@@ -16,7 +17,9 @@ export function buildApp() {
 
   // Log de todas as requisições
   app.addHook('onRequest', async (request, reply) => {
-    console.log(`[${new Date().toISOString()}] ${request.method} ${request.url} ${reply.statusCode}`)
+    console.log(
+      `[${new Date().toISOString()}] ${request.method} ${request.url} ${reply.statusCode}`,
+    )
   })
 
   // Zod serializers/validators
@@ -46,6 +49,8 @@ export function buildApp() {
   app.register(ScalarApiReference, {
     routePrefix: '/docs',
   })
+
+  app.register(jwtPlugin)
 
   // Aqui você registra suas rotas
   app.get('/', async (_request, reply) => {
