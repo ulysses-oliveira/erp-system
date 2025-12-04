@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs'
 import { userRepository } from './repository'
 import { CreateUserInput } from './model'
 
@@ -14,12 +15,18 @@ export const userService = {
     return user
   },
 
-  async create(data: CreateUserInput) {
-    const existingUser = await userRepository.findByEmail(data.email)
+  async create(input: CreateUserInput) {
+    const existingUser = await userRepository.findByEmail(input.email)
     if (existingUser) {
       throw new Error('Email already in use')
     }
-    return userRepository.create(data)
+
+    const password_hash = await bcrypt.hash(input.password, 10)
+
+    return userRepository.create({
+      ...input,
+      password: password_hash,
+    })
   },
 
   async update(id: number, data: Partial<CreateUserInput>) {
@@ -42,5 +49,5 @@ export const userService = {
       throw new Error('User not found')
     }
     return userRepository.delete(id)
-  }
+  },
 }

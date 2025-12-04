@@ -17,7 +17,7 @@ export default async function modulesAutoLoader(app: FastifyInstance) {
   for (const module of modules) {
     const folder = path.join(modulesDir, module)
 
-    // Buscamos apenas esses dois arquivos possíveis
+    // Busca routes.ts ou routes.js
     const files = ['routes.ts', 'routes.js']
       .map((f) => path.join(folder, f))
       .filter((file) => existsSync(file))
@@ -27,7 +27,6 @@ export default async function modulesAutoLoader(app: FastifyInstance) {
       continue
     }
 
-    // Sempre pega o primeiro (ts no dev, js no build)
     const file = files[0]
 
     try {
@@ -35,18 +34,17 @@ export default async function modulesAutoLoader(app: FastifyInstance) {
 
       if (typeof mod.default !== 'function') {
         console.warn(
-          `[Autoloader] Ignorado: ${file} (não exporta função default)`
+          `[Autoloader] Ignorado: ${file} — não exporta função default`
         )
         continue
       }
 
+      // cria prefixo automaticamente
       app.register(mod.default, { prefix: `/${module}` })
 
-      console.log(
-        `[Autoloader] ✅ Rotas carregadas: /${module} → ${path.basename(file)}`
-      )
+      console.log(`[Autoloader] /${module} → carregado de ${path.basename(file)}`)
     } catch (err) {
-      console.error(`[Autoloader] ❌ Erro ao carregar ${file}:`, err)
+      console.error(`[Autoloader] Erro ao carregar ${file}:`, err)
     }
   }
 }
